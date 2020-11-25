@@ -1,7 +1,7 @@
 CREATE OR REPLACE PROCEDURE ring_schema_indices() LANGUAGE plpgsql AS $$ 
 BEGIN
     /*
-        Monero SQL: Ring Membership
+        Ring Membership SQL
         (c) 2020 Neptune Research
         SPDX-License-Identifier: BSD-3-Clause
 
