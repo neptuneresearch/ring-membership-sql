@@ -205,8 +205,8 @@ Indices on materialized views are created by the stored procedure `ring_schema_i
     CALL ring_schema_indices();
     ```
 
-    - Indices make queries faster, so they are recommended to be installed BEFORE querying any output tables. 
-    - However, after their initial creation, indices are updated whenever tables are updated. If you're going to parse the entire blockchain, wait to install the indices until AFTER parsing all data, so that this extended parse operation doesn't waste time updating the indices after each individual transaction.
+    - Indices make queries faster, so they are recommended to be installed BEFORE querying any materialized views. 
+    - Indices will update themselves at time of materialized view refresh.
 
 
 # References
