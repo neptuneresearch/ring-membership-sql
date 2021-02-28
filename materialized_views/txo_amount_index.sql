@@ -19,21 +19,21 @@ CREATE MATERIALIZED VIEW txo_amount_index AS (
 			vout.key 						AS txo_key,
 
 			-- [RingCT Only]: Use this txo_amount.
-			0 								AS txo_amount
+			--0 								AS txo_amount
 
 			-- [Pre-RingCT]: Use this txo_amount.
 			/*
 				RingCT coinbase tx are indexed under amount 0 although they have amounts.
 				See Monero Core blockchain_db/blockchain_db.cpp: BlockchainDB::add_transaction
 			*/
-			--CASE WHEN (miner_tx).version = 2 THEN 0 ELSE vout.amount END AS txo_amount
+			CASE WHEN (miner_tx).version = 2 THEN 0 ELSE vout.amount END AS txo_amount
 
 		FROM monero block,
 		LATERAL UNNEST((miner_tx).vout) WITH ORDINALITY vout
 
 		-- [RingCT Only]: Include this WHERE.
 		-- [Pre-RingCT]: Omit this WHERE.
-        WHERE block.height >= 1220516 AND (miner_tx).version = 2
+        --WHERE block.height >= 1220516 AND (miner_tx).version = 2
 	),
 	tx_outputs AS (
 		SELECT
@@ -45,10 +45,10 @@ CREATE MATERIALIZED VIEW txo_amount_index AS (
 			vout.key 						AS txo_key,
 
 			-- [RingCT Only]: Use this txo_amount.
-			0 								AS txo_amount
+			--0 								AS txo_amount
 
 			-- [Pre-RingCT]: Use this txo_amount.
-			--vout.amount 					AS txo_amount
+			vout.amount 					AS txo_amount
 
 		FROM monero block,
 		LATERAL UNNEST(block.transactions) WITH ORDINALITY tx,
@@ -56,7 +56,7 @@ CREATE MATERIALIZED VIEW txo_amount_index AS (
 
 		-- [RingCT Only]: Include this WHERE.
 		-- [Pre-RingCT]: Omit this WHERE.
-        WHERE block.height >= 1220516 AND tx.version = 2
+        --WHERE block.height >= 1220516 AND tx.version = 2
 	),
 	combine_miner_txs_with_tx_outputs AS (
 		SELECT

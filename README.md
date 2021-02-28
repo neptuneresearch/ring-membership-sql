@@ -9,6 +9,7 @@ Ring Membership SQL is a set of Materialized Views for PostgreSQL that can be us
 - [Materialized View txo_amount_index](#Materialized_View_txo_amount_index)
 - [Materialized View tx_input_list](#Materialized_View_tx_input_list)
 - [Materialized View tx_ringmember_list](#Materialized_View_tx_ringmember_list)
+- [Applications (In Development)](#Applications_In_Development)
 - [Stored Procedure ring_refresh](#Stored_Procedure_ring_refresh)
 - [Stored Procedure ring_schema_indices](#Stored_Procedure_ring_schema_indices)
 - [References](#References)
@@ -41,7 +42,7 @@ Given those two data sets, ring member relationships between transactions can be
 ---
 # Installation
 ## Using SQL Files
-To install a SQL file, open the file and run the entire file contents in your PostgreSQL database using a PostgreSQL administration tool.
+To install a SQL file, run the entire file contents against your PostgreSQL database.
 
 Example for PostgreSQL CLI, where `DB_NAME` is the name of the target database, and `FILE.SQL` is the source filename:
 
@@ -50,13 +51,19 @@ Example for PostgreSQL CLI, where `DB_NAME` is the name of the target database, 
   ```
 
 ## Materialized Views
-This package includes the following materialized views.
+The core of this package is composed of 2 materialized views.
 
 | File | Description |
 | - | - |
 | `tx_input_list.sql` | Decodes key offsets to amount indices |
-| `tx_ringmember_list.sql` | Links `tx_input_list` with `txo_amount_index` |
 | `txo_amount_index.sql` | Creates a chronological index of all transaction outputs per amount |
+
+The default applications join them together.
+
+| File | Description |
+| - | - |
+| `tx_ringmember_list.sql` | List ring members (`txo_amount_index`) per transaction input (`tx_input_list`) |
+| `ringmember_tx_list.sql` | List ring member usage (`tx_input_list`) per transaction output (`txo_amount_index`) |
 
 Materialized views are created `WITH NO DATA` and must be refreshed before usage. See [Stored Procedure `ring_refresh`](#Stored_Procedure_ring_refresh).
 
@@ -86,7 +93,7 @@ Every transaction output, including coinbase transactions, indexed by amount.
 ### Notes
 1. `tx_index`: Coinbase transactions use index `-1`.
 
-2. `txo_amount`: Amount for RingCT transactions is always `0`.
+2. `txo_amount`: Amount for RingCT transaction outputs is always `0`. RingCT coinbases are also indexed under amount `0` even though they have nonzero amount values (see Monero Core `blockchain_db/blockchain_db.cpp: BlockchainDB::add_transaction`).
 
 3. `amount_index`: Amount Index starts at `0`.
 
@@ -177,6 +184,15 @@ Linking key offsets (`tx_input_list`) to the output amount index (`txo_amount_in
 - `tx_ringmember_list_source_tx_hash_idx`: index on `{ source_tx_hash }`
 - `tx_ringmember_list_ringmember_txo_key_idx`: index on `{ ringmember_txo_key }`
 - `tx_ringmember_list_ringmember_amount_index_idx`: index on `{ ringmember_amount_index }`
+
+
+---
+# Applications (In Development)
+These are still in development and are not yet included in the refresh or index procs.
+
+- `ringmember_tx_list`: Linking the output amount index (txo_amount_index) to key offsets (tx_input_list), list the transactions which use each output as a ring member.
+- `txo_first_ring`: For each transaction output, find the first transaction which uses it as a ring member.
+- `txo_no_ring`: Transaction outputs that have never been used as ring members.
 
 
 ---

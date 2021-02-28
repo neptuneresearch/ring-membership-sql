@@ -30,7 +30,7 @@ CREATE MATERIALIZED VIEW tx_input_list AS (
 
 	-- [RingCT Only]: Include this WHERE.
 	-- [Pre-RingCT]: Omit this WHERE.
-	WHERE block.height >= 1220516 AND tx.version = 2
+	--WHERE block.height >= 1220516 AND tx.version = 2
 
 	ORDER BY block.height ASC, tx.ordinality ASC, vin.ordinality ASC, vin_key_offsets.vin_key_offset_index ASC
 ) WITH NO DATA;

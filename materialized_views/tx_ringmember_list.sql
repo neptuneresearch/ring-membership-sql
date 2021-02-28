@@ -22,6 +22,12 @@ CREATE MATERIALIZED VIEW tx_ringmember_list AS (
 		RING.height 					AS ringmember_height,
 		RING.block_timestamp 			AS ringmember_block_timestamp
 	FROM tx_input_list TXI
-	JOIN txo_amount_index RING ON RING.amount_index = TXI.amount_index
-	ORDER BY TXI.height ASC, TXI.tx_index ASC, TXI.vin_index ASC, TXI.vin_key_offset_index ASC
+	JOIN txo_amount_index RING 
+		ON RING.txo_amount = TXI.vin_amount 
+		AND RING.amount_index = TXI.amount_index
+	ORDER BY 
+		TXI.height ASC, 
+		TXI.tx_index ASC, 
+		TXI.vin_index ASC, 
+		TXI.vin_key_offset_index ASC
 ) WITH NO DATA;
