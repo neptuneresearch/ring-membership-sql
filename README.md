@@ -6,12 +6,12 @@ Ring Membership SQL is a set of Materialized Views for PostgreSQL that can be us
 - [Overview](#Overview)
 - [Requirements](#Requirements)
 - [Installation](#Installation)
-- [Materialized View txo_amount_index](#Materialized_View_txo_amount_index)
-- [Materialized View tx_input_list](#Materialized_View_tx_input_list)
-- [Materialized View tx_ringmember_list](#Materialized_View_tx_ringmember_list)
-- [Applications (In Development)](#Applications_In_Development)
-- [Stored Procedure ring_refresh](#Stored_Procedure_ring_refresh)
-- [Stored Procedure ring_schema_indices](#Stored_Procedure_ring_schema_indices)
+- [Materialized View txo_amount_index](#Materialized-View-txo_amount_index)
+- [Materialized View tx_input_list](#Materialized-View-tx_input_list)
+- [Materialized View tx_ringmember_list](#Materialized-View-tx_ringmember_list)
+- [Applications (In Development)](#Applications-In-Development)
+- [Stored Procedure ring_refresh](#Stored-Procedure-ring_refresh)
+- [Stored Procedure ring_schema_indices](#Stored-Procedure-ring_schema_indices)
 - [References](#References)
   
 ---
