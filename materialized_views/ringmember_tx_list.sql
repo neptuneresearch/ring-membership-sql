@@ -22,12 +22,10 @@ CREATE MATERIALIZED VIEW ringmember_tx_list AS (
 		RING.vin_k_image 				AS source_k_image,
 		RING.vin_key_offset_index 		AS ringmember_index
 	FROM txo_amount_index TXO
-	-- LEFT JOIN: a transaction output may not have ever been used as a ring member.
-	LEFT JOIN tx_input_list RING 
-		ON RING.txo_amount = TXO.vin_amount 
+	-- JOIN: transaction outputs that have not ever been used as a ring member will not be included.
+	JOIN tx_input_list RING
+		ON RING.vin_amount = TXO.txo_amount
 		AND RING.amount_index = TXO.amount_index
-	-- Only return transaction outputs that have been used.
-	WHERE RING.height IS NOT NULL
 	ORDER BY 
 		TXO.amount_index ASC,
 		RING.height ASC,
