@@ -83,6 +83,7 @@ Every transaction output, including coinbase transactions, indexed by amount.
 | Column | Description | Type | Source |
 | - | - | - | - |
 | `height` | Block height | `BIGINT` | Block |
+| `block_timestamp` | Block timestamp | `BIGINT` | Block |
 | `tx_index` | Ordinality of transaction *(see Note 1)* | `BIGINT` (per `WITH ORDINALITY`) | Block |
 | `tx_hash` | Transaction hash | `BYTEA` | Transaction |
 | `txo_index` | Ordinality of transaction output | `BIGINT` (per `WITH ORDINALITY`) | Transaction |
