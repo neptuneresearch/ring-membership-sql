@@ -111,7 +111,7 @@ To switch filters, comment/uncomment the respective sections in the materialized
 - Column `txo_amount`
 - `WHERE` clauses
 
-Default filter is RingCT Only.
+Default filter is Pre-RingCT.
 
 ## Indices
 `ring_schema_indices()` includes the following indices for `txo_amount_index`.
@@ -150,7 +150,7 @@ RingCT Only filter will only include Transactions of Version 2 (blocks 1220516+)
 To switch filters, comment/uncomment the respective sections in the materialized view to change its query, and refresh the materialized view.
 - `WHERE` clause
 
-Default filter is RingCT Only.
+Default filter is Pre-RingCT.
 
 ## Indices
 `ring_schema_indices()` includes the following indices for `tx_input_list`.
