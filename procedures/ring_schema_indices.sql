@@ -29,29 +29,29 @@ BEGIN
     -- Create indices
     --   tx_input_list
     RAISE NOTICE 'Creating tx_input_list_height_idx';
-    CREATE INDEX tx_input_list_height_idx ON public.tx_input_list (height);
+    CREATE INDEX tx_input_list_height_idx ON tx_input_list (height);
     RAISE NOTICE 'Creating tx_input_list_tx_hash_idx';
-    CREATE INDEX tx_input_list_tx_hash_idx ON public.tx_input_list (tx_hash);
+    CREATE INDEX tx_input_list_tx_hash_idx ON tx_input_list (tx_hash);
     RAISE NOTICE 'Creating tx_input_list_amount_index_idx';
-    CREATE INDEX tx_input_list_amount_index_idx ON public.tx_input_list (amount_index);
+    CREATE INDEX tx_input_list_amount_index_idx ON tx_input_list (amount_index);
     --   txo_amount_index
     RAISE NOTICE 'Creating txo_amount_index_idx';
-    CREATE INDEX txo_amount_index_idx ON public.txo_amount_index (amount_index);
+    CREATE INDEX txo_amount_index_idx ON txo_amount_index (amount_index);
     RAISE NOTICE 'Creating txo_amount_index_tx_hash_idx';
-    CREATE INDEX txo_amount_index_tx_hash_idx ON public.txo_amount_index (tx_hash);
+    CREATE INDEX txo_amount_index_tx_hash_idx ON txo_amount_index (tx_hash);
     RAISE NOTICE 'Creating txo_amount_index_txo_key_idx';
-    CREATE INDEX txo_amount_index_txo_key_idx ON public.txo_amount_index (txo_key);
+    CREATE INDEX txo_amount_index_txo_key_idx ON txo_amount_index (txo_key);
     --   tx_ringmember_list
     RAISE NOTICE 'Creating tx_ringmember_list_source_height_idx';
-    CREATE INDEX tx_ringmember_list_source_height_idx ON public.tx_ringmember_list (source_height);
+    CREATE INDEX tx_ringmember_list_source_height_idx ON tx_ringmember_list (source_height);
     RAISE NOTICE 'Creating tx_ringmember_list_ringmember_height_idx';
-    CREATE INDEX tx_ringmember_list_ringmember_height_idx ON public.tx_ringmember_list (ringmember_height);
+    CREATE INDEX tx_ringmember_list_ringmember_height_idx ON tx_ringmember_list (ringmember_height);
     RAISE NOTICE 'Creating tx_ringmember_list_source_tx_hash_idx';
-    CREATE INDEX tx_ringmember_list_source_tx_hash_idx ON public.tx_ringmember_list (source_tx_hash);
+    CREATE INDEX tx_ringmember_list_source_tx_hash_idx ON tx_ringmember_list (source_tx_hash);
     RAISE NOTICE 'Creating tx_ringmember_list_ringmember_txo_key_idx';
-    CREATE INDEX tx_ringmember_list_ringmember_txo_key_idx ON public.tx_ringmember_list (ringmember_txo_key);
+    CREATE INDEX tx_ringmember_list_ringmember_txo_key_idx ON tx_ringmember_list (ringmember_txo_key);
     RAISE NOTICE 'Creating tx_ringmember_list_ringmember_amount_index_idx';
-    CREATE INDEX tx_ringmember_list_ringmember_amount_index_idx ON public.tx_ringmember_list (ringmember_amount_index);
+    CREATE INDEX tx_ringmember_list_ringmember_amount_index_idx ON tx_ringmember_list (ringmember_amount_index);
 
     RAISE NOTICE 'Indices created';
 END;
