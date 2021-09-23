@@ -80,5 +80,8 @@ CREATE MATERIALIZED VIEW txo_amount_index AS (
 		-- ROW_NUMBER starts at 1; add -1 so Amount Index starts at 0.
 		ROW_NUMBER() OVER (PARTITION BY txo_amount ORDER BY height ASC, tx_index ASC, txo_index ASC) - 1 AS amount_index
 	FROM combine_miner_txs_with_tx_outputs
-	ORDER BY height ASC, tx_index ASC, txo_index ASC
+	ORDER BY
+		height ASC,
+		tx_index ASC,
+		txo_index ASC
 ) WITH NO DATA;
