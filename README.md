@@ -144,8 +144,8 @@ List absolute key offsets per transaction input per transaction per block.
 ## Transaction version filter
 Two transaction version filters are possible for this view: Pre-RingCT and RingCT Only.
   
-Pre-RingCT filter will include transactions of both Version 1 (blocks 0-1220515) and Version 2 (blocks 1220516+).  
-RingCT Only filter will only include Transactions of Version 2 (blocks 1220516+).
+Pre-RingCT filter will include all transaction inputs of all transactions of all versions.
+RingCT Only filter will only include transaction inputs of zero amount from transactions of version 2 (blocks 1220516+).
 
 To switch filters, comment/uncomment the respective sections in the materialized view to change its query, and refresh the materialized view.
 - `WHERE` clause
