@@ -73,7 +73,7 @@ This package includes the following stored procedures.
 | File | Description |
 | - | - |
 | `ring_refresh.sql` | Refresh all Materialized Views |
-| `ring_schema_indices.sql` | Create indices on all Materialized Views |
+| `ring_schema_indices.sql` | Create or drop indices on all Materialized Views |
 
 
 ---
@@ -116,9 +116,12 @@ Default filter is Pre-RingCT.
 ## Indices
 `ring_schema_indices()` includes the following indices for `txo_amount_index`.
 
-- `txo_amount_index_idx`: index on `{ amount_index }`
-- `txo_amount_index_tx_hash_idx`: index on `{ tx_hash }`
-- `txo_amount_index_txo_key_idx`: index on `{ txo_key }`
+| Index level | Column(s) | Index name |
+| - | - | - |
+| 1 | `height` | `txo_amount_index_height_idx` |
+| 2 (Pre-RingCT) | `txo_amount, amount_index` | `txo_amount_index_txo_amount_amount_index_idx` |
+| 2 (RingCT Only) | `amount_index` | `txo_amount_index_amount_index_idx` |
+| 3 | `tx_hash` | `txo_amount_index_tx_hash_idx` |
 
 
 ---
@@ -156,9 +159,13 @@ Default filter is Pre-RingCT.
 ## Indices
 `ring_schema_indices()` includes the following indices for `tx_input_list`.
 
-- `tx_input_list_height_idx`: index on `{ height }`
-- `tx_input_list_tx_hash_idx`: index on `{ tx_hash }`
-- `tx_input_list_amount_index_idx`: index on `{ amount_index }`
+| Index level | Column(s) | Index name |
+| - | - | - |
+| 1 | `height` | `tx_input_list_height_idx` |
+| 2 (Pre-RingCT) | `vin_amount, amount_index` | `tx_input_list_vin_amount_amount_index_idx` |
+| 2 (RingCT Only) | `amount_index` | `tx_input_list_amount_index_idx` |
+| 3 | `tx_hash` | `tx_input_list_tx_hash_idx` |
+
 
 ---
 # Materialized View `tx_ringmember_list`
@@ -215,14 +222,19 @@ To switch filters, comment/uncomment the respective sections in the materialized
 Default filter is Pre-RingCT.
 
 ## Indices
-`ring_schema_indices()` includes the following indices for `tx_input_list`.
+`ring_schema_indices()` includes the following indices for `tx_ringmember_list`.
 
-- `tx_ringmember_list_source_height_idx`: index on `{ source_height }`
-- `tx_ringmember_list_ringmember_height_idx`: index on `{ ringmember_height }`
-- `tx_ringmember_list_source_tx_hash_idx`: index on `{ source_tx_hash }`
-- `tx_ringmember_list_ringmember_txo_key_idx`: index on `{ ringmember_txo_key }`
-- `tx_ringmember_list_ringmember_amount_index_idx`: index on `{ ringmember_amount_index }`
-
+Note: because of the default PostgreSQL limit on identifier length (`NAMEDATALEN=64`), the following indices have names which don't exactly match their source columns:
+- `tx_ringmember_list_source_vin_amt_ringmember_amt_index_idx [58]` (would be `tx_ringmember_list_source_vin_amount_ringmember_amount_index_idx [64]`)
+        
+| Index level | Column(s) | Index name |
+| - | - | - |
+| 1 | `source_height` | `tx_ringmember_list_source_height_idx` |
+| 1 | `ringmember_height` | `tx_ringmember_list_ringmember_height_idx` |
+| 2 (Pre-RingCT) | `source_vin_amount, ringmember_amount_index` | `tx_ringmember_list_source_vin_amt_ringmember_amt_index_idx` |
+| 2 (RingCT Only) | `ringmember_amount_index` | `tx_ringmember_list_ringmember_amount_index_idx` |
+| 3 | `source_tx_hash` | `tx_ringmember_list_source_tx_hash_idx` |
+| 3 | `ringmember_tx_hash` | `tx_ringmember_list_ringmember_tx_hash_idx` |
 
 ---
 # Applications (In Development)
@@ -245,22 +257,48 @@ Note that, as of PostgreSQL 11, materialized view refresh is not incremental: ea
 
 ---
 # Stored Procedure `ring_schema_indices`
-Indices on materialized views are created by the stored procedure `ring_schema_indices`.
+Create or drop indices on the ring membership materialized views `txo_amount_index, tx_input_list, tx_ringmember_list`.
 
-1. Use the file `ring_schema_indices.sql` to create the stored procedure `ring_schema_indices`.
+```
+CALL ring_schema_indices(index_level, create_enabled);
+```
 
-    ```
-    psql -d DB_NAME -f ring_schema_indices.sql
-    ```
+All parameters are optional. By default (no parameters specified), all indices will be created.
 
-2. WHEN READY to create indices on output tables, execute the stored procedure `ring_schema_indices()`.
+Indices make queries faster, so they are recommended to be created BEFORE querying any materialized views. 
 
-    ```
-    CALL ring_schema_indices();
-    ```
+However, after their initial creation, indices are updated whenever materialized views are refreshed. For maximum efficiency, always drop indices before refreshing materialized views, and only create them after all refreshes are completed.
 
-    - Indices make queries faster, so they are recommended to be installed BEFORE querying any materialized views. 
-    - Indices will update themselves at time of materialized view refresh.
+## Parameters
+| Parameter | Type | Description |
+| - | - | - |
+| ```index_level``` | ```INTEGER``` | *Optional*: See ["ring_schema_indices: Index Levels"](#Index-Levels). Defaults to ```NULL``` (all levels). |
+| ```create_enabled``` | ```BOOLEAN``` | *Optional*: Use `FALSE` to drop indices without recreating them. Defaults to `TRUE` (drop if exist, then create). |
+
+## Index Levels
+Only build the indices you need: an index level is the subset of indices related to the same type of data.
+
+Levels are additive, i.e. level 2 does not include level 1.
+
+| Index Level | Description |
+| - | - |
+| 1 | Block height |
+| 2 | Amount (Pre-RingCT) and Amount Index (Pre-RingCT and RingCT Only) |
+| 3 | Transaction hash |
+
+## Transaction version filter
+Two filters are possible for this procedure: Pre-RingCT and RingCT Only.
+
+Pre-RingCT filter will include the Amount value in the Amount Index indices.
+
+RingCT Only filter will not include the Amount value in the Amount Index indices, because the Amount is guaranteed to always have the value `0`.
+
+To switch filters, comment/uncomment the respective sections in the stored procedure.
+- `tx_input_list`: switch instruction set inside `IF` block for Level 2
+- `txo_amount_index`: switch instruction set inside `IF` block for Level 2
+- `tx_ringmember_list`: switch instruction set inside `IF` block for Level 2
+
+Default filter is Pre-RingCT.
 
 
 # References
