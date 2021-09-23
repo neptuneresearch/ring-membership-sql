@@ -3,7 +3,7 @@ DROP MATERIALIZED VIEW IF EXISTS tx_input_list;
 CREATE MATERIALIZED VIEW tx_input_list AS (
 	/*
 		Ring Membership SQL
-		(c) 2020 Neptune Research
+		(c) 2020-2021 Neptune Research
 		SPDX-License-Identifier: BSD-3-Clause
 
 		tx_input_list: List absolute key offsets per transaction input per transaction per block.

@@ -3,7 +3,7 @@ DROP MATERIALIZED VIEW IF EXISTS tx_ringmember_list;
 CREATE MATERIALIZED VIEW tx_ringmember_list AS (
     /*
         Ring Membership SQL
-        (c) 2020 Neptune Research
+        (c) 2020-2021 Neptune Research
         SPDX-License-Identifier: BSD-3-Clause
 
         tx_ringmember_list: Linking key offsets (tx_input_list) to the output amount index (txo_amount_index), list the ring members for each transaction input.

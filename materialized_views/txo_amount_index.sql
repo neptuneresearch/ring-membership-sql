@@ -3,7 +3,7 @@ DROP MATERIALIZED VIEW IF EXISTS txo_amount_index;
 CREATE MATERIALIZED VIEW txo_amount_index AS (
 	/*
 		Ring Membership SQL
-		(c) 2020 Neptune Research
+		(c) 2020-2021 Neptune Research
 		SPDX-License-Identifier: BSD-3-Clause
 
 		txo_amount_index: Global output amount index (txo_amount_index).
