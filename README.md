@@ -9,7 +9,7 @@ Ring Membership SQL is a set of Materialized Views for PostgreSQL that can be us
 - [Materialized View txo_amount_index](#Materialized-View-txo_amount_index)
 - [Materialized View tx_input_list](#Materialized-View-tx_input_list)
 - [Materialized View tx_ringmember_list](#Materialized-View-tx_ringmember_list)
-- [Applications (In Development)](#Applications-In-Development)
+- [Other Queries](#Other-Queries)
 - [Stored Procedure ring_refresh](#Stored-Procedure-ring_refresh)
 - [Stored Procedure ring_schema_indices](#Stored-Procedure-ring_schema_indices)
 - [References](#References)
@@ -237,12 +237,18 @@ Note: because of the default PostgreSQL limit on identifier length (`NAMEDATALEN
 | 3 | `ringmember_tx_hash` | `tx_ringmember_list_ringmember_tx_hash_idx` |
 
 ---
-# Applications (In Development)
-These are still in development and are not yet included in the refresh or index procs.
+# Other Queries
+Some other queries are provided. These are not included in the refresh or index procedures and must be refreshed or indexed manually.
 
-- `ringmember_tx_list`: Linking the output amount index (txo_amount_index) to key offsets (tx_input_list), list the transactions which use each output as a ring member.
+- `ringmember_tx_list`: Inverse of `tx_ringmember_list`: linking the output amount index (`txo_amount_index`) to key offsets (`tx_input_list`), list the transactions which use each output as a ring member.
 - `txo_first_ring`: For each transaction output, find the first transaction which uses it as a ring member.
 - `txo_no_ring`: Transaction outputs that have never been used as ring members.
+
+Some queries for `txo_first_ring`:
+
+- `txo_first_ring_distance`: helper view that adds columns for age in terms of block height and timestamp.
+- `txo_first_ring_distance_distribution`: age distribution for first usage of ring members.
+- `ring_lock_invalid`: tests the "10 block lock time for incoming outputs" introduced in HF v12 (result: no results because the consensus rule works).
 
 
 ---
