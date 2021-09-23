@@ -145,6 +145,7 @@ List absolute key offsets per transaction input per transaction per block.
 Two transaction version filters are possible for this view: Pre-RingCT and RingCT Only.
   
 Pre-RingCT filter will include all transaction inputs of all transactions of all versions.
+
 RingCT Only filter will only include transaction inputs of zero amount from transactions of version 2 (blocks 1220516+).
 
 To switch filters, comment/uncomment the respective sections in the materialized view to change its query, and refresh the materialized view.
@@ -163,19 +164,55 @@ Default filter is Pre-RingCT.
 # Materialized View `tx_ringmember_list`
 Linking key offsets (`tx_input_list`) to the output amount index (`txo_amount_index`), list the ring members for each transaction input.
 
+Inclusion in the `SELECT` list for columns from the given tables is categorized into:
+- Always
+- Optional
+- Never
+
+## Columns always included
+
 | Column | Description | Type | Source |
 | - | - | - | - |
 | `source_height` | Block height | `BIGINT` | `tx_input_list` |
 | `source_block_timestamp` | Block timestamp | `BIGINT` | `tx_input_list` |
-| `source_tx_hash` | Transaction hash | `BYTEA` | `tx_input_list` |
 | `source_tx_index` | Ordinality of transaction | `BIGINT` (per `WITH ORDINALITY`) | `tx_input_list` |
+| `source_tx_hash` | Transaction hash | `BYTEA` | `tx_input_list` |
 | `source_vin_index` | Ordinality of transaction input | `BIGINT` (per `WITH ORDINALITY`) | `tx_input_list` |
-| `source_k_image` | Transaction input key image | `BYTEA` | `tx_input_list` |
+| `source_vin_amount` | Transaction input amount | `BIGINT` | `tx_input_list` |
 | `ringmember_index` | Transaction input key offset index | `BIGINT` (per `WITH ORDINALITY`) | `tx_input_list` |
 | `ringmember_amount_index` | Ring member amount index | `BIGINT` | `txo_amount_index` |
-| `ringmember_txo_key` | Ring member output key | `BYTEA` | `txo_amount_index` |
 | `ringmember_height` | Ring member block height | `BIGINT` | `txo_amount_index` |
 | `ringmember_block_timestamp` | Ring member block timestamp | `BIGINT` | `txo_amount_index` |
+| `ringmember_tx_index` | Ordinality of ring member's transaction in its block | `BIGINT` (per `WITH ORDINALITY`) | `txo_amount_index` |
+| `ringmember_tx_hash` | Transaction hash of ring member's transaction | `BYTEA` | `txo_amount_index` |
+| `ringmember_txo_index` | Ordinality of ring member's transaction output | `BIGINT` (per `WITH ORDINALITY`) | `txo_amount_index` |
+
+## Columns optionally included
+Uncomment these columns to add them.
+
+| Column | Description | Type | Source |
+| - | - | - | - |
+| `source_vin_k_image` | Transaction input key image | `BYTEA` | `tx_input_list` |
+| `ringmember_txo_key` | Ring member output key | `BYTEA` | `txo_amount_index` |
+
+## Columns never included
+
+- `tx_input_list.vin_key_offset`: the differentially-encoded output amount index; being encoded, it is only useful for decoding into `tx_input_list.amount_index` (which is always included as `ringmember_amount_index`).
+
+- `txo_amount_index.{ txo_amount, amount_index }`: per the JOIN conditions, they are equal to the corresponding `tx_input_list` columns that are always included.
+
+## Transaction version filter
+Two transaction version filters are possible for this view: Pre-RingCT and RingCT Only.
+  
+Pre-RingCT filter will JOIN the given tables on both Amount and Amount Index, and output the `source_vin_amount` column.
+
+RingCT Only filter will JOIN the given tables only on Amount Index since the Amount is guaranteed to be zero, and not output the `source_vin_amount` column for the same reason.
+
+To switch filters, comment/uncomment the respective sections in the materialized view to change its query, and refresh the materialized view.
+- `source_vin_amount` column
+- `JOIN` clause
+
+Default filter is Pre-RingCT.
 
 ## Indices
 `ring_schema_indices()` includes the following indices for `tx_input_list`.
