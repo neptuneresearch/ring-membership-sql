@@ -99,12 +99,12 @@ BEGIN
 
     -- tx_ringmember_list
     IF index_level IS NULL OR index_level = 1 THEN
-        RAISE NOTICE 'ring_schema_indices [%]: Dropping tx_ringmember_list_source_block_height_idx', timeofday()::timestamp;
-        DROP INDEX IF EXISTS tx_ringmember_list_source_block_height_idx;
+        RAISE NOTICE 'ring_schema_indices [%]: Dropping tx_ringmember_list_tx_block_height_idx', timeofday()::timestamp;
+        DROP INDEX IF EXISTS tx_ringmember_list_tx_block_height_idx;
 
         IF create_enabled THEN
-            RAISE NOTICE 'ring_schema_indices [%]: Creating tx_ringmember_list_source_block_height_idx', timeofday()::timestamp;
-            CREATE INDEX tx_ringmember_list_source_block_height_idx ON tx_ringmember_list (source_block_height);
+            RAISE NOTICE 'ring_schema_indices [%]: Creating tx_ringmember_list_tx_block_height_idx', timeofday()::timestamp;
+            CREATE INDEX tx_ringmember_list_tx_block_height_idx ON tx_ringmember_list (tx_block_height);
         END IF;
     END IF;
 
@@ -119,34 +119,34 @@ BEGIN
     END IF;
 
     IF index_level IS NULL OR index_level = 2 THEN
-        -- [Pre-RingCT]: Index on pair { source_vin_amount, ringmember_amount_index }.
-        RAISE NOTICE 'ring_schema_indices [%]: Dropping tx_ringmember_list_source_vin_amt_ringmember_amt_index_idx', timeofday()::timestamp;
-        DROP INDEX IF EXISTS tx_ringmember_list_source_vin_amt_ringmember_amt_index_idx;
+        -- [Pre-RingCT]: Index on pair { tx_vin_amount, ringmember_txo_amount_index }.
+        RAISE NOTICE 'ring_schema_indices [%]: Dropping tx_ringmember_list_tx_vin_amt_ringmember_txo_amt_index_idx', timeofday()::timestamp;
+        DROP INDEX IF EXISTS tx_ringmember_list_tx_vin_amt_ringmember_txo_amt_index_idx;
 
         IF create_enabled THEN
-            RAISE NOTICE 'ring_schema_indices [%]: Creating tx_ringmember_list_source_vin_amt_ringmember_amt_index_idx', timeofday()::timestamp;
-            CREATE INDEX tx_ringmember_list_source_vin_amt_ringmember_amt_index_idx ON tx_ringmember_list (source_vin_amount, ringmember_amount_index);
+            RAISE NOTICE 'ring_schema_indices [%]: Creating tx_ringmember_list_tx_vin_amt_ringmember_txo_amt_index_idx', timeofday()::timestamp;
+            CREATE INDEX tx_ringmember_list_tx_vin_amt_ringmember_txo_amt_index_idx ON tx_ringmember_list (tx_vin_amount, ringmember_txo_amount_index);
         END IF;
 
-        -- [RingCT Only]: Omit source_vin_amount because source_vin_amount = 0 always.
+        -- [RingCT Only]: Omit tx_vin_amount because tx_vin_amount = 0 always.
         /*
-        RAISE NOTICE 'ring_schema_indices [%]: Dropping tx_ringmember_list_ringmember_amount_index_idx', timeofday()::timestamp;
-        DROP INDEX IF EXISTS tx_ringmember_list_ringmember_amount_index_idx;
+        RAISE NOTICE 'ring_schema_indices [%]: Dropping tx_ringmember_list_ringmember_txo_amount_index_idx', timeofday()::timestamp;
+        DROP INDEX IF EXISTS tx_ringmember_list_ringmember_txo_amount_index_idx;
 
         IF create_enabled THEN
-            RAISE NOTICE 'ring_schema_indices [%]: Creating tx_ringmember_list_ringmember_amount_index_idx', timeofday()::timestamp;
-            CREATE INDEX tx_ringmember_list_ringmember_amount_index_idx ON tx_ringmember_list (ringmember_amount_index);
+            RAISE NOTICE 'ring_schema_indices [%]: Creating tx_ringmember_list_ringmember_txo_amount_index_idx', timeofday()::timestamp;
+            CREATE INDEX tx_ringmember_list_ringmember_txo_amount_index_idx ON tx_ringmember_list (ringmember_txo_amount_index);
         END IF;
         */
     END IF;
 
     IF index_level IS NULL OR index_level = 3 THEN
-        RAISE NOTICE 'ring_schema_indices [%]: Dropping tx_ringmember_list_source_tx_hash_idx', timeofday()::timestamp;
-        DROP INDEX IF EXISTS tx_ringmember_list_source_tx_hash_idx;
+        RAISE NOTICE 'ring_schema_indices [%]: Dropping tx_ringmember_list_tx_hash_idx', timeofday()::timestamp;
+        DROP INDEX IF EXISTS tx_ringmember_list_tx_hash_idx;
 
         IF create_enabled THEN
-            RAISE NOTICE 'ring_schema_indices [%]: Creating tx_ringmember_list_source_tx_hash_idx', timeofday()::timestamp;
-            CREATE INDEX tx_ringmember_list_source_tx_hash_idx ON tx_ringmember_list (source_tx_hash);
+            RAISE NOTICE 'ring_schema_indices [%]: Creating tx_ringmember_list_tx_hash_idx', timeofday()::timestamp;
+            CREATE INDEX tx_ringmember_list_tx_hash_idx ON tx_ringmember_list (tx_hash);
         END IF;
     END IF;
 

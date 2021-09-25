@@ -195,43 +195,45 @@ Inclusion in the `SELECT` list for columns from the given tables is categorized 
 
 | Column | Description | Type | Source |
 | - | - | - | - |
-| `source_block_height` | Block height | `BIGINT` | `tx_input_list` |
-| `source_block_timestamp` | Block timestamp | `BIGINT` | `tx_input_list` |
-| `source_tx_index` | Ordinality of transaction | `BIGINT` (per `WITH ORDINALITY`) | `tx_input_list` |
-| `source_tx_hash` | Transaction hash | `BYTEA` | `tx_input_list` |
-| `source_vin_index` | Ordinality of transaction input | `BIGINT` (per `WITH ORDINALITY`) | `tx_input_list` |
-| `source_vin_amount` | Transaction input amount | `BIGINT` | `tx_input_list` |
-| `ringmember_index` | Transaction input key offset index | `BIGINT` (per `WITH ORDINALITY`) | `tx_input_list` |
-| `ringmember_amount_index` | Ring member amount index | `BIGINT` | `txo_amount_index` |
-| `ringmember_block_height` | Ring member block height | `BIGINT` | `txo_amount_index` |
-| `ringmember_block_timestamp` | Ring member block timestamp | `BIGINT` | `txo_amount_index` |
-| `ringmember_tx_index` | Ordinality of ring member's transaction in its block | `BIGINT` (per `WITH ORDINALITY`) | `txo_amount_index` |
+| `tx_block_height` | Block height of transaction | `BIGINT` | `tx_input_list` |
+| `tx_block_timestamp` | Block timestamp of transaction | `BIGINT` | `tx_input_list` |
+| `tx_block_tx_index` | Ordinality of transaction in its block | `BIGINT` (per `WITH ORDINALITY`) | `tx_input_list` |
+| `tx_hash` | Transaction hash of transaction | `BYTEA` | `tx_input_list` |
+| `tx_vin_index` | Ordinality of transaction input in its transaction | `BIGINT` (per `WITH ORDINALITY`) | `tx_input_list` |
+| `tx_vin_amount` | Transaction input amount | `BIGINT` | `tx_input_list` |
+| `tx_vin_ringmember_index` | Transaction input key offset index | `BIGINT` (per `WITH ORDINALITY`) | `tx_input_list` |
+| `ringmember_block_height` | Block height of ring member | `BIGINT` | `txo_amount_index` |
+| `ringmember_block_timestamp` | Block timestamp of ring member | `BIGINT` | `txo_amount_index` |
+| `ringmember_block_tx_index` | Ordinality of ring member's transaction in its block | `BIGINT` (per `WITH ORDINALITY`) | `txo_amount_index` |
 | `ringmember_tx_hash` | Transaction hash of ring member's transaction | `BYTEA` | `txo_amount_index` |
-| `ringmember_txo_index` | Ordinality of ring member's transaction output | `BIGINT` (per `WITH ORDINALITY`) | `txo_amount_index` |
+| `ringmember_tx_txo_index` | Ordinality of transaction output in ring member's transaction | `BIGINT` (per `WITH ORDINALITY`) | `txo_amount_index` |
+| `ringmember_txo_amount_index` | Ring member output amount index | `BIGINT` | `txo_amount_index` |
 
 ## Columns optionally included
 Uncomment these columns to add them.
 
 | Column | Description | Type | Source |
 | - | - | - | - |
-| `source_vin_k_image` | Transaction input key image | `BYTEA` | `tx_input_list` |
+| `tx_vin_k_image` | Transaction input key image | `BYTEA` | `tx_input_list` |
 | `ringmember_txo_key` | Ring member output key | `BYTEA` | `txo_amount_index` |
 
 ## Columns never included
 
-- `tx_input_list.vin_key_offset`: the differentially-encoded output amount index; being encoded, it is only useful for decoding into `tx_input_list.amount_index` (which is always included as `ringmember_amount_index`).
+- `tx_input_list.vin_key_offset`: the differentially-encoded output amount index; being encoded, it is only useful after `tx_input_list` decodes it into `amount_index`.
 
-- `txo_amount_index.{ txo_amount, amount_index }`: per the JOIN conditions, they are equal to the corresponding `tx_input_list` columns that are always included.
+- `tx_input_list.amount_index`: per the JOIN, this is equal to `txo_amount_index.amount_index`, which is always included as `ringmember_txo_amount_index`.
+
+- `txo_amount_index.txo_amount`: per the JOIN, this is equal to `tx_input_list.vin_amount`, which is always included as `tx_vin_amount`.
 
 ## Transaction version filter
 Two transaction version filters are possible for this view: Pre-RingCT and RingCT Only.
   
-Pre-RingCT filter will JOIN the given tables on both Amount and Amount Index, and output the `source_vin_amount` column.
+Pre-RingCT filter will JOIN the given tables on both Amount and Amount Index, and output the `tx_vin_amount` column.
 
-RingCT Only filter will JOIN the given tables only on Amount Index since the Amount is guaranteed to be zero, and not output the `source_vin_amount` column for the same reason.
+RingCT Only filter will JOIN the given tables only on Amount Index since the Amount is guaranteed to be zero, and not output the `tx_vin_amount` column for the same reason.
 
 To switch filters, comment/uncomment the respective sections in the materialized view to change its query, and refresh the materialized view.
-- `source_vin_amount` column
+- `tx_vin_amount` column
 - `JOIN` clause
 
 Default filter is Pre-RingCT.
@@ -240,15 +242,15 @@ Default filter is Pre-RingCT.
 `ring_schema_indices()` includes the following indices for `tx_ringmember_list`.
 
 Note: because of the default PostgreSQL limit on identifier length (`NAMEDATALEN=64`), the following indices have names which don't exactly match their source columns:
-- `tx_ringmember_list_source_vin_amt_ringmember_amt_index_idx [58]` (would be `tx_ringmember_list_source_vin_amount_ringmember_amount_index_idx [64]`)
+- `tx_ringmember_list_tx_vin_amt_ringmember_amt_index_idx [54]` (would be `tx_ringmember_list_tx_vin_amount_ringmember_txo_amount_index_idx [64]`)
         
 | Index level | Column(s) | Index name |
 | - | - | - |
-| 1 | `source_block_height` | `tx_ringmember_list_source_block_height_idx` |
+| 1 | `tx_block_height` | `tx_ringmember_list_tx_block_height_idx` |
 | 1 | `ringmember_block_height` | `tx_ringmember_list_ringmember_block_height_idx` |
-| 2 (Pre-RingCT) | `source_vin_amount, ringmember_amount_index` | `tx_ringmember_list_source_vin_amt_ringmember_amt_index_idx` |
-| 2 (RingCT Only) | `ringmember_amount_index` | `tx_ringmember_list_ringmember_amount_index_idx` |
-| 3 | `source_tx_hash` | `tx_ringmember_list_source_tx_hash_idx` |
+| 2 (Pre-RingCT) | `tx_vin_amount, ringmember_txo_amount_index` | `tx_ringmember_list_tx_vin_amt_ringmember_txo_amt_index_idx` |
+| 2 (RingCT Only) | `ringmember_txo_amount_index` | `tx_ringmember_list_ringmember_txo_amount_index_idx` |
+| 3 | `tx_hash` | `tx_ringmember_list_tx_hash_idx` |
 | 3 | `ringmember_tx_hash` | `tx_ringmember_list_ringmember_tx_hash_idx` |
 
 ---

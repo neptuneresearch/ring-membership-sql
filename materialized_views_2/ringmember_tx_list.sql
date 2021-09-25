@@ -11,29 +11,29 @@ CREATE MATERIALIZED VIEW ringmember_tx_list AS (
 
     SELECT
         -- txo_amount_index
-        TXO.block_height            AS output_block_height,
-        TXO.block_timestamp         AS output_block_timestamp,
-        TXO.tx_index                AS output_tx_index,
-        TXO.tx_hash                 AS output_tx_hash,
-        TXO.txo_index               AS output_txo_index,
+        TXO.block_height            AS txo_block_height,
+        TXO.block_timestamp         AS txo_block_timestamp,
+        TXO.tx_index                AS txo_block_tx_index,
+        TXO.tx_hash                 AS txo_tx_hash,
+        TXO.txo_index               AS txo_tx_txo_index,
         --   Optional: output key
-        --TXO.txo_key                 AS output_txo_key,
+        --TXO.txo_key                 AS txo_key,
 
         -- [RingCT Only]: Omit this column since it will always be zero in value.
         -- [Pre-RingCT]: Include this column.
-        TXO.txo_amount              AS output_amount,
+        TXO.txo_amount              AS txo_amount,
 
-        TXO.amount_index            AS output_amount_index,
+        TXO.amount_index            AS txo_amount_index,
 
         -- tx_input_list
-        RING.vin_key_offset_index   AS ringmember_index,
-        RING.block_height           AS ring_block_height,
-        RING.block_timestamp        AS ring_block_timestamp,
-        RING.tx_index               AS ring_tx_index,
-        RING.tx_hash                AS ring_tx_hash,
-        RING.vin_index              AS ring_vin_index
+        RING.block_height           AS ringtx_block_height,
+        RING.block_timestamp        AS ringtx_block_timestamp,
+        RING.tx_index               AS ringtx_block_tx_index,
+        RING.tx_hash                AS ringtx_tx_hash,
+        RING.vin_index              AS ringtx_vin_index,
+        RING.vin_key_offset_index   AS ringtx_vin_ringmember_index
         --   Optional: key image
-        --RING.vin_k_image            AS ring_vin_k_image
+        --RING.vin_k_image            AS ringtx_vin_k_image
     FROM txo_amount_index TXO
     -- JOIN: transaction outputs that have not ever been used as a ring member will not be included.
     JOIN tx_input_list RING

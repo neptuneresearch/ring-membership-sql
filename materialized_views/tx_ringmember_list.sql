@@ -11,27 +11,27 @@ CREATE MATERIALIZED VIEW tx_ringmember_list AS (
 
     SELECT
         -- tx_input_list
-        TXI.block_height            AS source_block_height,
-        TXI.block_timestamp         AS source_block_timestamp,
-        TXI.tx_index                AS source_tx_index,
-        TXI.tx_hash                 AS source_tx_hash,
-        TXI.vin_index               AS source_vin_index,
+        TXI.block_height            AS tx_block_height,
+        TXI.block_timestamp         AS tx_block_timestamp,
+        TXI.tx_index                AS tx_block_tx_index,
+        TXI.tx_hash                 AS tx_hash,
+        TXI.vin_index               AS tx_vin_index,
         --   Optional: key image
-        --TXI.vin_k_image             AS source_vin_k_image,
+        --TXI.vin_k_image             AS tx_vin_k_image,
 
         -- [RingCT Only]: Omit this column since it will always be zero in value.
         -- [Pre-RingCT]: Include this column.
-        TXI.vin_amount              AS source_vin_amount,
+        TXI.vin_amount              AS tx_vin_amount,
         
-        TXI.vin_key_offset_index    AS ringmember_index,
-        TXI.amount_index            AS ringmember_amount_index,
+        TXI.vin_key_offset_index    AS tx_vin_ringmember_index,
 
         -- txo_amount_index
         RING.block_height           AS ringmember_block_height,
         RING.block_timestamp        AS ringmember_block_timestamp,
-        RING.tx_index               AS ringmember_tx_index,
+        RING.tx_index               AS ringmember_block_tx_index,
         RING.tx_hash                AS ringmember_tx_hash,
-        RING.txo_index              AS ringmember_txo_index
+        RING.txo_index              AS ringmember_tx_txo_index,
+        RING.amount_index           AS ringmember_txo_amount_index
         --   Optional: output key
         --RING.txo_key                AS ringmember_txo_key
     FROM tx_input_list TXI
