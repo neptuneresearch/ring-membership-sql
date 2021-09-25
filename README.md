@@ -22,8 +22,9 @@ Ring Membership SQL is a set of Materialized Views for PostgreSQL that can be us
   - [Indices](#Indices-2)
 - [Other Queries](#Other-Queries)
 - [Stored Procedure ring_refresh](#Stored-Procedure-ring_refresh)
-- [Stored Procedure ring_schema_indices](#Stored-Procedure-ring_schema_indices)
   - [Parameters](#Parameters)
+- [Stored Procedure ring_schema_indices](#Stored-Procedure-ring_schema_indices)
+  - [Parameters](#Parameters-1)
   - [Index Levels](#Index-Levels)
   - [Transaction version filter](#Transaction-version-filter-3)
 - [References](#References)
@@ -270,10 +271,19 @@ Some queries for `txo_first_ring`:
 Utility procedure to refresh all materialized views in this package.
 
 ```
-CALL ring_refresh();
+CALL ring_refresh(indices_enabled, index_level);
 ```
 
+All parameters are optional. By default (no parameters specified), indices will be (re)created at full index level, after the materialized views are refreshed. See [Stored Procedure `ring_schema_indices`](#Stored-Procedure-ring_schema_indices) for more information regarding materialized view refreshing and indices.
+
 Note that, as of PostgreSQL 11, materialized view refresh is not incremental: each refresh must always rebuild all data starting from block 0.
+
+## Parameters
+| Parameter | Type | Description |
+| - | - | - |
+| ```indices_enabled``` | ```BOOLEAN``` | *Optional*: Use `FALSE` to disable index (re)creation. Defaults to `TRUE` (indices will be (re)created). |
+| ```index_level``` | ```INTEGER``` | *Optional*: Only used when `indices_enabled = TRUE`. See ["ring_schema_indices: Index Levels"](#Index-Levels). Defaults to ```NULL``` (all levels). |
+
 
 ---
 # Stored Procedure `ring_schema_indices`
@@ -287,7 +297,7 @@ All parameters are optional. By default (no parameters specified), all indices w
 
 Indices make queries faster, so they are recommended to be created BEFORE querying any materialized views. 
 
-However, after their initial creation, indices are updated whenever materialized views are refreshed. For maximum efficiency, always drop indices before refreshing materialized views, and only create them after all refreshes are completed.
+However, after their initial creation, indices are updated whenever materialized views are refreshed. For maximum efficiency, it is recommended drop indices BEFORE refreshing materialized views, and only create them AFTER all refreshes are completed.
 
 ## Parameters
 | Parameter | Type | Description |

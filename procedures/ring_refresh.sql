@@ -15,7 +15,7 @@ BEGIN
     --   Note that this CALL does not use the index_level parameter, for 2 reasons:
     --   (1) New index_level is not guaranteed to be equal to level of existing indices,
     --       so if it was different, the existing level wouldn't be dropped.
-    --   (2) No indices can exist anyway during refresh, to ensure best performance.
+    --   (2) With respect to best performance, no indices should exist anyway during refresh.
     IF indices_enabled THEN
         RAISE NOTICE 'ring_refresh [%]: Dropping indices before refresh', timeofday()::timestamp;
         CALL ring_schema_indices(NULL, FALSE);
