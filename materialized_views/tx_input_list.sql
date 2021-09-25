@@ -11,7 +11,7 @@ CREATE MATERIALIZED VIEW tx_input_list AS (
 
     SELECT
         -- Transactions
-        block.height                            AS height,
+        block.height                            AS block_height,
         block.timestamp                         AS block_timestamp,
         tx.ordinality                           AS tx_index,
         tx.hash                                 AS tx_hash,

@@ -11,7 +11,7 @@ CREATE MATERIALIZED VIEW ringmember_tx_list AS (
 
     SELECT
         -- txo_amount_index
-        TXO.height                  AS output_height,
+        TXO.block_height            AS output_block_height,
         TXO.block_timestamp         AS output_block_timestamp,
         TXO.tx_index                AS output_tx_index,
         TXO.tx_hash                 AS output_tx_hash,
@@ -27,7 +27,7 @@ CREATE MATERIALIZED VIEW ringmember_tx_list AS (
 
         -- tx_input_list
         RING.vin_key_offset_index   AS ringmember_index,
-        RING.height                 AS ring_height,
+        RING.block_height           AS ring_block_height,
         RING.block_timestamp        AS ring_block_timestamp,
         RING.tx_index               AS ring_tx_index,
         RING.tx_hash                AS ring_tx_hash,
@@ -44,7 +44,7 @@ CREATE MATERIALIZED VIEW ringmember_tx_list AS (
         AND RING.amount_index = TXO.amount_index
     ORDER BY 
         TXO.amount_index ASC,
-        RING.height ASC,
+        RING.block_height ASC,
         RING.tx_index ASC,
         RING.vin_index ASC,
         RING.vin_key_offset_index ASC

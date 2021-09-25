@@ -13,12 +13,12 @@ BEGIN
 
     -- tx_input_list
     IF index_level IS NULL OR index_level = 1 THEN
-        RAISE NOTICE 'Dropping tx_input_list_height_idx';
-        DROP INDEX IF EXISTS tx_input_list_height_idx;
+        RAISE NOTICE 'Dropping tx_input_list_block_height_idx';
+        DROP INDEX IF EXISTS tx_input_list_block_height_idx;
 
         IF create_enabled THEN
-            RAISE NOTICE 'Creating tx_input_list_height_idx';
-            CREATE INDEX tx_input_list_height_idx ON tx_input_list (height);
+            RAISE NOTICE 'Creating tx_input_list_block_height_idx';
+            CREATE INDEX tx_input_list_block_height_idx ON tx_input_list (block_height);
         END IF;
     END IF;
 
@@ -56,12 +56,12 @@ BEGIN
 
     -- txo_amount_index
     IF index_level IS NULL OR index_level = 1 THEN
-        RAISE NOTICE 'Dropping txo_amount_index_height_idx';
-        DROP INDEX IF EXISTS txo_amount_index_height_idx;
+        RAISE NOTICE 'Dropping txo_amount_index_block_height_idx';
+        DROP INDEX IF EXISTS txo_amount_index_block_height_idx;
 
         IF create_enabled THEN
-            RAISE NOTICE 'Creating txo_amount_index_height_idx';
-            CREATE INDEX txo_amount_index_height_idx ON txo_amount_index (height);
+            RAISE NOTICE 'Creating txo_amount_index_block_height_idx';
+            CREATE INDEX txo_amount_index_block_height_idx ON txo_amount_index (block_height);
         END IF;
     END IF;
 
@@ -99,22 +99,22 @@ BEGIN
 
     -- tx_ringmember_list
     IF index_level IS NULL OR index_level = 1 THEN
-        RAISE NOTICE 'Dropping tx_ringmember_list_source_height_idx';
-        DROP INDEX IF EXISTS tx_ringmember_list_source_height_idx;
+        RAISE NOTICE 'Dropping tx_ringmember_list_source_block_height_idx';
+        DROP INDEX IF EXISTS tx_ringmember_list_source_block_height_idx;
 
         IF create_enabled THEN
-            RAISE NOTICE 'Creating tx_ringmember_list_source_height_idx';
-            CREATE INDEX tx_ringmember_list_source_height_idx ON tx_ringmember_list (source_height);
+            RAISE NOTICE 'Creating tx_ringmember_list_source_block_height_idx';
+            CREATE INDEX tx_ringmember_list_source_block_height_idx ON tx_ringmember_list (source_block_height);
         END IF;
     END IF;
 
     IF index_level IS NULL OR index_level = 1 THEN
-        RAISE NOTICE 'Dropping tx_ringmember_list_ringmember_height_idx';
-        DROP INDEX IF EXISTS tx_ringmember_list_ringmember_height_idx;
+        RAISE NOTICE 'Dropping tx_ringmember_list_ringmember_block_height_idx';
+        DROP INDEX IF EXISTS tx_ringmember_list_ringmember_block_height_idx;
 
         IF create_enabled THEN
-            RAISE NOTICE 'Creating tx_ringmember_list_ringmember_height_idx';
-            CREATE INDEX tx_ringmember_list_ringmember_height_idx ON tx_ringmember_list (ringmember_height);
+            RAISE NOTICE 'Creating tx_ringmember_list_ringmember_block_height_idx';
+            CREATE INDEX tx_ringmember_list_ringmember_block_height_idx ON tx_ringmember_list (ringmember_block_height);
         END IF;
     END IF;
 

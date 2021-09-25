@@ -96,7 +96,7 @@ Every transaction output, including coinbase transactions, indexed by amount.
 
 | Column | Description | Type | Source |
 | - | - | - | - |
-| `height` | Block height | `BIGINT` | Block |
+| `block_height` | Block height | `BIGINT` | Block |
 | `block_timestamp` | Block timestamp | `BIGINT` | Block |
 | `tx_index` | Ordinality of transaction *(see Note 1)* | `BIGINT` (per `WITH ORDINALITY`) | Block |
 | `tx_hash` | Transaction hash | `BYTEA` | Transaction |
@@ -132,7 +132,7 @@ Default filter is Pre-RingCT.
 
 | Index level | Column(s) | Index name |
 | - | - | - |
-| 1 | `height` | `txo_amount_index_height_idx` |
+| 1 | `block_height` | `txo_amount_index_block_height_idx` |
 | 2 (Pre-RingCT) | `txo_amount, amount_index` | `txo_amount_index_txo_amount_amount_index_idx` |
 | 2 (RingCT Only) | `amount_index` | `txo_amount_index_amount_index_idx` |
 | 3 | `tx_hash` | `txo_amount_index_tx_hash_idx` |
@@ -144,7 +144,7 @@ List absolute key offsets per transaction input per transaction per block.
 
 | Column | Description | Type | Source |
 | - | - | - | - |
-| `height` | Block height | `BIGINT` | Block |
+| `block_height` | Block height | `BIGINT` | Block |
 | `block_timestamp` | Block timestamp | `BIGINT` | Block |
 | `tx_index` | Ordinality of transaction | `BIGINT` (per `WITH ORDINALITY`) | Block |
 | `tx_hash` | Transaction hash | `BYTEA` | Transaction |
@@ -175,7 +175,7 @@ Default filter is Pre-RingCT.
 
 | Index level | Column(s) | Index name |
 | - | - | - |
-| 1 | `height` | `tx_input_list_height_idx` |
+| 1 | `block_height` | `tx_input_list_block_height_idx` |
 | 2 (Pre-RingCT) | `vin_amount, amount_index` | `tx_input_list_vin_amount_amount_index_idx` |
 | 2 (RingCT Only) | `amount_index` | `tx_input_list_amount_index_idx` |
 | 3 | `tx_hash` | `tx_input_list_tx_hash_idx` |
@@ -194,7 +194,7 @@ Inclusion in the `SELECT` list for columns from the given tables is categorized 
 
 | Column | Description | Type | Source |
 | - | - | - | - |
-| `source_height` | Block height | `BIGINT` | `tx_input_list` |
+| `source_block_height` | Block height | `BIGINT` | `tx_input_list` |
 | `source_block_timestamp` | Block timestamp | `BIGINT` | `tx_input_list` |
 | `source_tx_index` | Ordinality of transaction | `BIGINT` (per `WITH ORDINALITY`) | `tx_input_list` |
 | `source_tx_hash` | Transaction hash | `BYTEA` | `tx_input_list` |
@@ -202,7 +202,7 @@ Inclusion in the `SELECT` list for columns from the given tables is categorized 
 | `source_vin_amount` | Transaction input amount | `BIGINT` | `tx_input_list` |
 | `ringmember_index` | Transaction input key offset index | `BIGINT` (per `WITH ORDINALITY`) | `tx_input_list` |
 | `ringmember_amount_index` | Ring member amount index | `BIGINT` | `txo_amount_index` |
-| `ringmember_height` | Ring member block height | `BIGINT` | `txo_amount_index` |
+| `ringmember_block_height` | Ring member block height | `BIGINT` | `txo_amount_index` |
 | `ringmember_block_timestamp` | Ring member block timestamp | `BIGINT` | `txo_amount_index` |
 | `ringmember_tx_index` | Ordinality of ring member's transaction in its block | `BIGINT` (per `WITH ORDINALITY`) | `txo_amount_index` |
 | `ringmember_tx_hash` | Transaction hash of ring member's transaction | `BYTEA` | `txo_amount_index` |
@@ -243,8 +243,8 @@ Note: because of the default PostgreSQL limit on identifier length (`NAMEDATALEN
         
 | Index level | Column(s) | Index name |
 | - | - | - |
-| 1 | `source_height` | `tx_ringmember_list_source_height_idx` |
-| 1 | `ringmember_height` | `tx_ringmember_list_ringmember_height_idx` |
+| 1 | `source_block_height` | `tx_ringmember_list_source_block_height_idx` |
+| 1 | `ringmember_block_height` | `tx_ringmember_list_ringmember_block_height_idx` |
 | 2 (Pre-RingCT) | `source_vin_amount, ringmember_amount_index` | `tx_ringmember_list_source_vin_amt_ringmember_amt_index_idx` |
 | 2 (RingCT Only) | `ringmember_amount_index` | `tx_ringmember_list_ringmember_amount_index_idx` |
 | 3 | `source_tx_hash` | `tx_ringmember_list_source_tx_hash_idx` |

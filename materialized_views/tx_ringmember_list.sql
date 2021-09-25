@@ -11,7 +11,7 @@ CREATE MATERIALIZED VIEW tx_ringmember_list AS (
 
     SELECT
         -- tx_input_list
-        TXI.height                  AS source_height,
+        TXI.block_height            AS source_block_height,
         TXI.block_timestamp         AS source_block_timestamp,
         TXI.tx_index                AS source_tx_index,
         TXI.tx_hash                 AS source_tx_hash,
@@ -27,7 +27,7 @@ CREATE MATERIALIZED VIEW tx_ringmember_list AS (
         TXI.amount_index            AS ringmember_amount_index,
 
         -- txo_amount_index
-        RING.height                 AS ringmember_height,
+        RING.block_height           AS ringmember_block_height,
         RING.block_timestamp        AS ringmember_block_timestamp,
         RING.tx_index               AS ringmember_tx_index,
         RING.tx_hash                AS ringmember_tx_hash,
@@ -42,7 +42,7 @@ CREATE MATERIALIZED VIEW tx_ringmember_list AS (
         -- [Pre-RingCT and RingCT Only]: Always include JOIN condition for amount_index.
         AND RING.amount_index = TXI.amount_index
     ORDER BY 
-        TXI.height ASC, 
+        TXI.block_height ASC, 
         TXI.tx_index ASC, 
         TXI.vin_index ASC, 
         TXI.vin_key_offset_index ASC

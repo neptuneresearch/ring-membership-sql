@@ -10,14 +10,14 @@ CREATE MATERIALIZED VIEW txo_first_ring AS (
     */
 
     SELECT
-        TXO.height              AS txo_height,
+        TXO.block_height        AS txo_block_height,
         TXO.tx_index            AS txo_tx_index,
         TXO.txo_index           AS txo_txo_index,
         TXO.block_timestamp     AS txo_block_timestamp,
         TXO.tx_hash             AS txo_tx_hash,
         TXO.txo_amount          AS txo_txo_amount,
         TXO.amount_index        AS txo_amount_index,
-        RING.height             AS ring_height,
+        RING.block_height       AS ring_block_height,
         RING.block_timestamp    AS ring_block_timestamp,
         RING.tx_hash            AS ring_tx_hash
     FROM txo_amount_index TXO
@@ -30,12 +30,12 @@ CREATE MATERIALIZED VIEW txo_first_ring AS (
                     _RING.vin_amount, 
                     _RING.amount_index 
                 ORDER BY 
-                    _RING.height ASC,
+                    _RING.block_height ASC,
                     _RING.tx_index ASC,
                     _RING.vin_index ASC,
                     _RING.vin_key_offset_index ASC
             ) AS ring_index,
-            height,
+            block_height,
             block_timestamp,
             tx_hash
         FROM tx_input_list _RING
@@ -44,7 +44,7 @@ CREATE MATERIALIZED VIEW txo_first_ring AS (
         AND RING.amount_index = TXO.amount_index
         AND RING.ring_index = 1
     ORDER BY 
-        TXO.height ASC,
+        TXO.block_height ASC,
         TXO.tx_index ASC,
         TXO.txo_index ASC
 ) WITH NO DATA;

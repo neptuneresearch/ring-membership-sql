@@ -11,7 +11,7 @@ CREATE MATERIALIZED VIEW txo_amount_index AS (
 
     WITH miner_txs AS (
         SELECT
-            block.height                    AS height,
+            block.height                    AS block_height,
             block.timestamp                 AS block_timestamp,
             -1                              AS tx_index,
             (miner_tx).hash                 AS tx_hash,
@@ -37,7 +37,7 @@ CREATE MATERIALIZED VIEW txo_amount_index AS (
     ),
     tx_outputs AS (
         SELECT
-            block.height                    AS height,
+            block.height                    AS block_height,
             block.timestamp                 AS block_timestamp,
             tx.ordinality                   AS tx_index,
             tx.hash                         AS tx_hash,
@@ -70,7 +70,7 @@ CREATE MATERIALIZED VIEW txo_amount_index AS (
         FROM tx_outputs
     )
     SELECT 
-        height,
+        block_height,
         block_timestamp,
         tx_index,
         tx_hash,
@@ -78,10 +78,10 @@ CREATE MATERIALIZED VIEW txo_amount_index AS (
         txo_key,
         txo_amount,
         -- ROW_NUMBER starts at 1; add -1 so Amount Index starts at 0.
-        ROW_NUMBER() OVER (PARTITION BY txo_amount ORDER BY height ASC, tx_index ASC, txo_index ASC) - 1 AS amount_index
+        ROW_NUMBER() OVER (PARTITION BY txo_amount ORDER BY block_height ASC, tx_index ASC, txo_index ASC) - 1 AS amount_index
     FROM combine_miner_txs_with_tx_outputs
     ORDER BY
-        height ASC,
+        block_height ASC,
         tx_index ASC,
         txo_index ASC
 ) WITH NO DATA;
