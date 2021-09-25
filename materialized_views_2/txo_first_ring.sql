@@ -11,11 +11,11 @@ CREATE MATERIALIZED VIEW txo_first_ring AS (
 
     SELECT
         TXO.block_height        AS txo_block_height,
-        TXO.tx_index            AS txo_tx_index,
-        TXO.txo_index           AS txo_txo_index,
         TXO.block_timestamp     AS txo_block_timestamp,
+        TXO.tx_index            AS txo_tx_index,
         TXO.tx_hash             AS txo_tx_hash,
-        TXO.txo_amount          AS txo_txo_amount,
+        TXO.txo_index           AS txo_index,
+        TXO.txo_amount          AS txo_amount,
         TXO.amount_index        AS txo_amount_index,
         RING.block_height       AS ring_block_height,
         RING.block_timestamp    AS ring_block_timestamp,
