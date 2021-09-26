@@ -92,7 +92,7 @@ The default applications join them together.
 | `tx_ringmember_list.sql` | List ring members (`txo_amount_index`) per transaction input (`tx_input_list`) |
 | `ringmember_tx_list.sql` | List ring member usage (`tx_input_list`) per transaction output (`txo_amount_index`) |
 
-Materialized views are created `WITH NO DATA` and must be refreshed before usage. See [Stored Procedure `ring_refresh`](#Stored_Procedure_ring_refresh).
+Materialized views are created `WITH NO DATA` and must be refreshed before usage. See [Stored Procedure `ring_refresh`](#Stored-Procedure-ring_refresh).
 
 Note that when installing materialized views, the following message is normal and is not an issue:
 
