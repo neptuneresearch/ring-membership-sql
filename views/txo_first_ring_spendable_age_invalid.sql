@@ -1,4 +1,4 @@
-CREATE OR REPLACE VIEW ring_lock_invalid AS
+CREATE OR REPLACE VIEW txo_first_ring_spendable_age_invalid AS
 SELECT
 	COUNT(1)
 FROM txo_first_ring

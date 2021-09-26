@@ -255,17 +255,18 @@ Note: because of the default PostgreSQL limit on identifier length (`NAMEDATALEN
 
 ---
 # Other Queries
-Some other queries are provided. These are not included in the refresh or index procedures and must be refreshed or indexed manually.
+Some other queries are provided. 
 
-- `ringmember_tx_list`: Inverse of `tx_ringmember_list`: linking the output amount index (`txo_amount_index`) to key offsets (`tx_input_list`), list the transactions which use each output as a ring member.
-- `txo_first_ring`: For each transaction output, find the first transaction which uses it as a ring member.
-- `txo_no_ring`: Transaction outputs that have never been used as ring members.
+- Materialized Views (in directory `materialized_views_2`)
+  - `ringmember_tx_list`: Inverse of `tx_ringmember_list`: linking the output amount index (`txo_amount_index`) to key offsets (`tx_input_list`), list the transactions which use each output as a ring member.
+  - `txo_first_ring`: List all transaction outputs and the first transaction which uses each as a ring member.
+  - `txo_no_ring`: List all transaction outputs that have never been used as ring members.
+  - *Note: these Materialized Views are not included in `ring_refresh()` or `ring_schema_indices()`, and must be refreshed or indexed manually.*
 
-Some queries for `txo_first_ring`:
-
-- `txo_first_ring_distance`: helper view that adds columns for age in terms of block height and timestamp.
-- `txo_first_ring_distance_distribution`: age distribution for first usage of ring members.
-- `ring_lock_invalid`: tests the "10 block lock time for incoming outputs" introduced in HF v12 (result: no results because the consensus rule works).
+- Views for `txo_first_ring` (in directory `views`):
+  - `txo_first_ring_distance`: helper view that adds columns for age in terms of block height and timestamp.
+  - `txo_first_ring_distance_distribution`: age distribution for first usage of ring members.
+  - `txo_first_ring_spendable_age_invalid`: tests the "10 block lock time for incoming outputs" introduced in HF v12 (result: no results because the consensus rule works).
 
 
 ---
@@ -276,7 +277,7 @@ Utility procedure to refresh all materialized views in this package.
 CALL ring_refresh(indices_enabled, index_level);
 ```
 
-All parameters are optional. By default (no parameters specified), indices will be (re)created at full index level, after the materialized views are refreshed. See [Stored Procedure `ring_schema_indices`](#Stored-Procedure-ring_schema_indices) for more information regarding materialized view refreshing and indices.
+All parameters are optional. By default (no parameters specified), indices will be (re)created at full [index level](#Index-Levels), after the materialized views are refreshed. See [Stored Procedure `ring_schema_indices`](#Stored-Procedure-ring_schema_indices) for more information regarding materialized view refreshing and indices.
 
 Note that, as of PostgreSQL 11, materialized view refresh is not incremental: each refresh must always rebuild all data starting from block 0.
 
@@ -308,7 +309,7 @@ However, after their initial creation, indices are updated whenever materialized
 | ```create_enabled``` | ```BOOLEAN``` | *Optional*: Use `FALSE` to drop indices without recreating them. Defaults to `TRUE` (drop if exist, then create). |
 
 ## Index Levels
-Only build the indices you need: an index level is the subset of indices related to the same type of data.
+Only build the indices you need: an index level is a subset of indices related to the same type of data.
 
 Levels are additive, i.e. level 2 does not include level 1.
 

@@ -6,7 +6,7 @@ CREATE MATERIALIZED VIEW txo_first_ring AS (
         (c) 2021 Neptune Research
         SPDX-License-Identifier: BSD-3-Clause
 
-        txo_first_ring: For each transaction output, find the first transaction which uses it as a ring member.
+        txo_first_ring: List all transaction outputs and the first transaction which uses each as a ring member.
     */
 
     SELECT

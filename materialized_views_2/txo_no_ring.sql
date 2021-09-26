@@ -6,7 +6,7 @@ CREATE MATERIALIZED VIEW txo_no_ring AS (
         (c) 2021 Neptune Research
         SPDX-License-Identifier: BSD-3-Clause
 
-        txo_no_ring: Transaction outputs that have never been used as ring members.
+        txo_no_ring: List all transaction outputs that have never been used as ring members.
     */
 
     SELECT 
