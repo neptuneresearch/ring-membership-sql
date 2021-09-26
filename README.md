@@ -45,13 +45,23 @@ Given those two data sets, ring member relationships between transactions can be
 ---
 # Requirements
 
-- PostgreSQL 11+
-  - These procedures and tables were written and tested with PostgreSQL versions 11.5 and 12.3. Older versions may work.
+- PostgreSQL 13+
+  - This package was last tested with PostgreSQL version 13.3. Older versions may work; development has taken place under versions 11.5, 12.3, 13.2.
 
 - Monero blockchain data
   - A table of blocks, where each block row includes an array-typed column of transactions, and each transaction row includes further arrays for inputs and outputs, with key offsets, amounts, and output keys.
 
     This set of Materialized Views is designed specifically to work with the Monero schema in `coinmetrics-export` [[2]](#References), but it could be ported to any schema that has the sufficient data.
+
+- Disk space (estimate)
+
+  - As of mainnet block height 2457499 (date 2021-09-26), with all [index levels](#Index-Levels):
+
+    |Object|Table Size|Indices Size|Total Size|
+      |----------|----------|------------|----------|
+      |tx_input_list|63 GB|18 GB|81 GB|
+      |txo_amount_index|8990 MB|3696 MB|12 GB|
+      |tx_ringmember_list|72 GB|16 GB|88 GB|
 
 
 ---
@@ -68,6 +78,8 @@ Example for PostgreSQL CLI, where `DB_NAME` is the name of the target database, 
 ## Materialized Views
 The core of this package is composed of 2 materialized views.
 
+Everything in this package uses these 2 materialized views: install them both first before installing any other files.
+
 | File | Description |
 | - | - |
 | `tx_input_list.sql` | Decodes key offsets to amount indices |
@@ -82,13 +94,19 @@ The default applications join them together.
 
 Materialized views are created `WITH NO DATA` and must be refreshed before usage. See [Stored Procedure `ring_refresh`](#Stored_Procedure_ring_refresh).
 
+Note that when installing materialized views, the following message is normal and is not an issue:
+
+    materialized view "materialized_view_name" does not exist, skipping
+
+This message occurs because the file first tries to `DROP` the given materialized view before it `CREATE`s it, in case it already exists.
+
 ## Stored Procedures
 This package includes the following stored procedures.
 
 | File | Description |
 | - | - |
-| `ring_refresh.sql` | Refresh all Materialized Views |
-| `ring_schema_indices.sql` | Create or drop indices on all Materialized Views |
+| `ring_refresh.sql` | Refresh Materialized Views `tx_input_list, txo_amount_index, tx_ringmember_list` |
+| `ring_schema_indices.sql` | Create or drop indices on Materialized Views `tx_input_list, txo_amount_index, tx_ringmember_list` |
 
 
 ---
@@ -241,7 +259,7 @@ Default filter is Pre-RingCT.
 ## Indices
 `ring_schema_indices()` includes the following indices for `tx_ringmember_list`.
 
-Note: because of the default PostgreSQL limit on identifier length (`NAMEDATALEN=64`), the following indices have names which don't exactly match their source columns:
+Note: because of the default PostgreSQL limit on identifier length (`NAMEDATALEN = 64`), the following indices have names which don't exactly match their source columns:
 - `tx_ringmember_list_tx_vin_amt_ringmember_amt_index_idx [54]` (would be `tx_ringmember_list_tx_vin_amount_ringmember_txo_amount_index_idx [64]`)
         
 | Index level | Column(s) | Index name |
@@ -271,7 +289,8 @@ Some other queries are provided.
 
 ---
 # Stored Procedure `ring_refresh`
-Utility procedure to refresh all materialized views in this package.
+Utility procedure to refresh the ring membership materialized views `tx_input_list, txo_amount_index, tx_ringmember_list`.
+
 
 ```
 CALL ring_refresh(indices_enabled, index_level);
@@ -290,7 +309,7 @@ Note that, as of PostgreSQL 11, materialized view refresh is not incremental: ea
 
 ---
 # Stored Procedure `ring_schema_indices`
-Create or drop indices on the ring membership materialized views `txo_amount_index, tx_input_list, tx_ringmember_list`.
+Create or drop indices on the ring membership materialized views `tx_input_list, txo_amount_index, tx_ringmember_list`.
 
 ```
 CALL ring_schema_indices(index_level, create_enabled);
